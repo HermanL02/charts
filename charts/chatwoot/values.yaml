@@ -82,6 +82,14 @@ services:
     #  service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
 
 imagePullSecrets: []
+
+# Optional /etc/hosts entries injected into chatwoot-web and chatwoot-worker pods.
+# Used by self-hosted installs to blackhole calls to hub.chatwoot.com so the
+# daily plan-reconciler can't overwrite local InstallationConfig values.
+hostAliases: []
+# - ip: "127.0.0.1"
+#   hostnames: ["hub.2.chatwoot.com", "app.chatwoot.com"]
+
 nameOverride: ""
 fullnameOverride: ""
 
