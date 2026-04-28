@@ -16,10 +16,15 @@ Rails.application.config.after_initialize do
 
   Llm::Config.initialize! if defined?(Llm::Config)
 
+  # Not every provider exposes a *_api_base setter — some (e.g. DeepSeek,
+  # Perplexity) hardcode the URL in their provider class. Skip the setter when
+  # it doesn't exist; the provider's default base will still resolve correctly.
   RubyLLM.configure do |config|
     %i[deepseek mistral perplexity openrouter ollama gpustack].each do |provider|
-      config.public_send(:"#{provider}_api_key=",  api_key)
-      config.public_send(:"#{provider}_api_base=", api_base) if api_base.present?
+      key_setter  = :"#{provider}_api_key="
+      base_setter = :"#{provider}_api_base="
+      config.public_send(key_setter,  api_key)  if config.respond_to?(key_setter)
+      config.public_send(base_setter, api_base) if api_base.present? && config.respond_to?(base_setter)
     end
   end
 rescue ActiveRecord::ConnectionNotEstablished, ActiveRecord::StatementInvalid => e
